@@ -1,11 +1,11 @@
 import os
 
-# set environment variables to limit cpu usage
-os.environ["OMP_NUM_THREADS"] = "4"  # export OMP_NUM_THREADS=4
-os.environ["OPENBLAS_NUM_THREADS"] = "4"  # export OPENBLAS_NUM_THREADS=4
-os.environ["MKL_NUM_THREADS"] = "6"  # export MKL_NUM_THREADS=6
-os.environ["VECLIB_MAXIMUM_THREADS"] = "4"  # export VECLIB_MAXIMUM_THREADS=4
-os.environ["NUMEXPR_NUM_THREADS"] = "6"  # export NUMEXPR_NUM_THREADS=6
+
+os.environ["OMP_NUM_THREADS"] = "4" 
+os.environ["OPENBLAS_NUM_THREADS"] = "4"  
+os.environ["MKL_NUM_THREADS"] = "6"  
+os.environ["VECLIB_MAXIMUM_THREADS"] = "4"  
+os.environ["NUMEXPR_NUM_THREADS"] = "6"  
 
 from tqdm import tqdm
 import torch
@@ -19,7 +19,7 @@ def validate_all(model, val_loader, criterion, device, config, model_name, targe
     model.eval()
     pbar = tqdm(val_loader)
 
-    # track performance
+   
     epoch_losses = torch.Tensor()
     if target_name == "single-classification":
         metrics = ClasswiseAccuracy(config.num_classes)
@@ -34,23 +34,23 @@ def validate_all(model, val_loader, criterion, device, config, model_name, targe
 
             if "x" in sample.keys():
                 if torch.isnan(sample["x"]).any():
-                    # some s1 scenes are known to have NaNs...
+                    
                     continue
             else:
                 if torch.isnan(sample["s1"]).any() or torch.isnan(sample["s2"]).any():
-                    # some s1 scenes are known to have NaNs...
+                    
                     continue
 
             if model_name == "baseline" or model_name == "swin-baseline":
                 s1 = sample["s1"]
                 s2 = sample["s2"]
                 if config.s1_input_channels == 0:
-                    # no data fusion
+                   
                     img = s2.to(device)
                 elif config.s2_input_channels == 0:
                     img = s1.to(device)
                 else:
-                    # data fusion
+                  
                     img = torch.cat([s1, s2], dim=1).to(device)
 
             elif model_name == "normal-simclr":
@@ -149,7 +149,7 @@ def validate_alignment_backbone(
     all_s1_ses = []
     all_s2_ses = []
     pbar = tqdm(dl)
-    # begin by encoding all scans
+   
     print("Encoding images")
     for idx, sample in enumerate(pbar):
         s1_img = sample["s1"].to(device)
@@ -165,14 +165,14 @@ def validate_alignment_backbone(
     num_scans, _, _, _ = all_s1_ses.size()
     all_s2_ses = torch.cat(all_s2_ses)
 
-    # now correlate encodings
+   
     s1_b, s1_c, s1_h, s1_w = all_s1_ses.size()
     all_s1_ses = all_s1_ses.to(device)
     all_s2_ses = all_s2_ses.to(device)
 
     print("Calculating encoding similarities + statistics")
     similarities = get_dataset_similarities(all_s1_ses, all_s2_ses, device)
-    # corrs = (F.conv2d(all_dxa_ses, all_mri_ses)/(mri_h*mri_w)).view(num_scans,num_scans,-1)
+   
     rank_stats = get_rank_statistics(similarities)
     rank_stats = {"validation_" + k: v for k, v in rank_stats.items()}
 
