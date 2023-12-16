@@ -6,8 +6,7 @@ import albumentations as A
 
 
 class AlbumentationsToTorchTransform:
-    """Take a list of Albumentation transforms and apply them
-    s.t. it is compatible with a Pytorch dataloader"""
+    
 
     def __init__(self, augmentations):
         self.augmentations = augmentations
@@ -19,7 +18,7 @@ class AlbumentationsToTorchTransform:
 
 
 class GaussianBlur(object):
-    """Gaussian blur augmentation in SimCLR https://arxiv.org/abs/2002.05709"""
+   
 
     def __init__(self, sigma=[0.1, 2.0]):
         self.sigma = sigma
@@ -67,7 +66,7 @@ class NCELoss(torch.nn.Module):
 
 
 def normalise_channels(scan_img, eps=1e-5):
-    # normalize each channel
+
     scan_min = scan_img.flatten(start_dim=-2).min(dim=-1)[0][:, None, None]
     scan_max = scan_img.flatten(start_dim=-2).max(dim=-1)[0][:, None, None]
     return (scan_img - scan_min) / (scan_max - scan_min + eps)
@@ -84,12 +83,8 @@ def save_checkpoint_single_model(
         "val_stats": val_stats,
         "epochs": epochs,
     }
-    # if not os.path.isdir(save_weights_path):
-    #    os.mkdir(save_weights_path)
-    # previous_checkpoints = glob.glob(save_weights_path + '/ckpt*.pt', recursive=True)
-    torch.save(state, save_weights_path)  # + '/ckpt' + str(epochs) + '.pt')
-    # for previous_checkpoint in previous_checkpoints:
-    #    os.remove(previous_checkpoint)
+     torch.save(state, save_weights_path)  # + '/ckpt' + str(epochs) + '.pt')
+   
     return
 
 
@@ -105,12 +100,9 @@ def save_checkpoint(
         "val_stats": val_stats,
         "epochs": epochs,
     }
-    # if not os.path.isdir(save_weights_path):
-    #    os.mkdir(save_weights_path)
-    # previous_checkpoints = glob.glob(save_weights_path + '/ckpt*.pt', recursive=True)
-    torch.save(state, save_weights_path)  # + '/ckpt' + str(epochs) + '.pt')
-    # for previous_checkpoint in previous_checkpoints:
-    #    os.remove(previous_checkpoint)
+   
+    torch.save(state, save_weights_path) 
+    
     return
 
 
@@ -214,8 +206,7 @@ def class_wise_acc(pred, label, results, num_classes=10):
             corrects = (tags[label == l] == label[label == l]).float()
             results[str(l) + "_correct"] += corrects.sum()
             results[str(l) + "_total"] += corrects.numel()
-            # acc = acc * 100
-            # results[str(l)].extend(corrects.detach().cpu().numpy().tolist())
+           
 
     return results
 
